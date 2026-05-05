@@ -9,6 +9,13 @@ app.get('/', (req, res) => {
 });
 
 // inicia o servidor localmente — na Vercel essa parte é pulada
+app.get('/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date()
+  })
+});
+
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
