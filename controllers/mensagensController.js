@@ -1,55 +1,65 @@
-import prisma from '../prisma/client.js';
+import prisma from '../prisma/client.js'; // importa o singleton do Prisma
 
+// GET /mensagens — lista todas as mensagens (mais recentes primeiro, com dados do autor)
 export async function listarMensagens(req, res) {
-  try {
-    const mensagens = await prisma.mensagem.findMany({
-      include: {
-        autor: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-          },
+  const mensagens = await prisma.mensagem.findMany({
+    orderBy: { criadoEm: 'desc' },  // mais recente primeiro
+    include: {
+      autor: {                        // traz dados do autor junto
+        select: {
+          nome: true,                 // nome do autor
+          fotoUrl: true,              // foto do autor
         },
       },
-    });
-    return res.json(mensagens);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+    },
+  });
+  res.json(mensagens); // retorna a lista com autor embutido
 }
 
-export async function criarMensagem(req, res) {
-  const { texto, autorId } = req.body;
+// --- Stubs para o desafio do aluno ---
 
+// 🎯 POST /mensagens — cria uma nova mensagem
+// Siga o mesmo padrão do criarAluno
+// Valide que texto não está vazio (400 se faltar)
+export async function criarMensagem(req, res) {
   try {
+    const { texto, autorId } = req.body;
+
+    if (!texto || texto.trim() === '') {
+      return res.status(400).json({ erro: 'O texto da mensagem não pode estar vazio.' });
+    }
+
     const novaMensagem = await prisma.mensagem.create({
       data: {
         texto,
-        autorId: Number(autorId),
+        autorId,
       },
     });
-    return res.status(201).json(novaMensagem);
+
+    res.status(201).json(novaMensagem);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.status(500).json({ erro: error.message });
   }
 }
 
+// 🎯 DELETE /mensagens/:id — deleta uma mensagem
+// Siga o mesmo padrão do deletarAluno
 export async function deletarMensagem(req, res) {
-  const { id } = req.params;
-
   try {
+    const id = parseInt(req.params.id);
+
     await prisma.mensagem.delete({
-      where: {
-        id: Number(id),
-      },
+      where: { id },
     });
-    return res.status(204).end();
+
+    res.json({ message: 'Mensagem deletada com sucesso' });
   } catch (error) {
-    return res.status(404).json({
-      message: 'Mensagem não encontrada',
-      error: 'Mensagem não encontrada',
-      erro: 'Mensagem não encontrada',
-    });
+    if (error.code === 'P2025') {
+      return res.status(404).json({ 
+        message: 'Mensagem não encontrada', 
+        erro: 'Mensagem não encontrada' 
+      });
+    }
+    res.status(500).json({ erro: error.message });
   }
 }

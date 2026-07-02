@@ -2,6 +2,7 @@ import express from 'express';                // importa o Express
 import alunosRouter from './routes/alunos.js'; // importa o router de alunos <- NOVO
 import mensagensRouter from './routes/mensagens.js';
 import logger from './middlewares/logger.js';      // importa o middleware de log
+import mensagensRouter from './routes/mensagens.js';
 
 const app = express();      // cria a aplicação Express
 const PORT = 3000;          // porta do servidor
@@ -18,6 +19,9 @@ app.get('/', (req, res) => {
 app.get('/status', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
+
+app.use('/alunos', alunosRouter);
+app.use('/mensagens', mensagensRouter);
 
 // registra as rotas de alunos com prefixo /alunos  <- NOVO
 app.use('/alunos', alunosRouter);
