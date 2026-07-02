@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -20,14 +19,17 @@ enum Role {
 }
 
 model Aluno {
-  id        Int        @id @default(autoincrement())
-  nome      String
-  email     String     @unique
-  senhaHash String
-  fotoUrl   String?
-  role      Role       @default(USER)
-  criadoEm  DateTime   @default(now())
-  mensagens Mensagem[]
+  id            Int        @id @default(autoincrement())
+  nome          String
+  cidade        String
+  frase         String?
+  planosFuturos String?
+  email         String     @unique
+  senhaHash     String
+  fotoUrl       String?
+  role          Role       @default(USER)
+  criadoEm      DateTime   @default(now())
+  mensagens     Mensagem[]
 }
 
 model Mensagem {

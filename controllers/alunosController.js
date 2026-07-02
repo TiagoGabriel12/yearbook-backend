@@ -33,7 +33,11 @@ export async function buscarAluno(req, res) {
   });
 
   if (!aluno) {
-    return res.status(404).json({ erro: 'Aluno não encontrado' });
+    return res.status(404).json({ 
+      message: 'Aluno não encontrado',
+      error: 'Aluno não encontrado',
+      erro: 'Aluno não encontrado' 
+    });
   }
 
   res.json(aluno);
@@ -52,21 +56,29 @@ export async function criarAluno(req, res) {
     role,
   } = req.body;
 
-  const alunoCriado = await prisma.aluno.create({
-    data: {
-      nome,
-      email,
-      senhaHash,
-      cidade,
-      frase,
-      planosFuturos,
-      fotoUrl,
-      role,
-    },
-    select: selectSemSenha,
-  });
+  try {
+    const alunoCriado = await prisma.aluno.create({
+      data: {
+        nome,
+        email,
+        senhaHash,
+        cidade,
+        frase,
+        planosFuturos,
+        fotoUrl,
+        role,
+      },
+      select: selectSemSenha,
+    });
 
-  return res.status(201).json(alunoCriado);
+    return res.status(201).json(alunoCriado);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: error.message,
+      error: error.message
+    });
+  }
 }
 
 // PUT /alunos/:id — atualiza um aluno existente
@@ -86,6 +98,8 @@ export async function atualizarAluno(req, res) {
     return res.status(200).json(alunoAtualizado);
   } catch (error) {
     return res.status(404).json({
+      message: 'Aluno não encontrado',
+      error: 'Aluno não encontrado',
       erro: 'Aluno não encontrado',
     });
   }
@@ -105,6 +119,8 @@ export async function deletarAluno(req, res) {
     return res.status(204).end();
   } catch (error) {
     return res.status(404).json({
+      message: 'Aluno não encontrado',
+      error: 'Aluno não encontrado',
       erro: 'Aluno não encontrado',
     });
   }
